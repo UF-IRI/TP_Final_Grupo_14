@@ -3,9 +3,9 @@
 #include <iostream>
 using namespace std;
 
-enum Estado {
-	SANO, INTERNADO, DIFUNTO
-}eEstado;
+//enum Estado {
+//	SANO, INTERNADO, DIFUNTO
+//}eEstado;
 
 
 struct fecha
@@ -16,7 +16,7 @@ typedef struct fecha Fecha;
 
 struct contacto
 {
-	//dni_paciente, telefono, celular, direccion, mail
+
 	string  telefono;
 	string email;
 	string direccion;
@@ -26,12 +26,11 @@ struct contacto
 typedef struct contacto Contacto;
 struct medico
 {
-	//matricula, nombre, apellido, telefono, especialidad, activo
 	string nombre;
 	string apellido;
 	string telefono;
 	string especialidad;
-	string activo;
+	bool activo;
 	string matricula;
 
 };
@@ -41,12 +40,14 @@ struct ultimaConsulta
 {
 	//dni_pac, fecha_solicitado, fecha_turno, presento, matricula_med
 	Fecha consulta;  //fecha_solicitado
-	Medico medicoAsignado;
-	string medico;
-	string fecha_turno;
-	string presento;
+	Fecha fecha_turno;
+	bool presento;
 	string matricula_med;
 	string dni_pac;
+
+
+	Medico medicoAsignado;
+	string medico;
 };
 typedef struct ultimaConsulta ultConsulta;
 
@@ -60,16 +61,16 @@ struct paciente
 	string apellido;
 	string sexo;
 	Fecha nacimiento;
-	Estado estado;
+	string estado;
 	string obra_social;
 
-	//Contacto cont;
-	//ultConsulta consulta;
-	//bool asistencia;
-	//bool retorno;
-	//string archivado;
+	Contacto cont;
+	ultConsulta consulta;
+	bool asistencia;
+	bool retorno;
+	string archivado;
 	//string id;
-	
+
 
 };
 typedef struct paciente Paciente;

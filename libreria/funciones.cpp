@@ -1,6 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "Funciones.h"
 #include <string>
-#
+
 bool chequearfechas(ultConsulta* Consulta)
 {
     time_t auxiliar_fecha = time(0);
@@ -37,7 +38,7 @@ void guardararchivo(string nombrearchivo, Paciente* pac)
         }
         else
         {
-            archivo << pac->nombre << ',' << pac->apellido << ',' << pac->sexo << ',' << pac->nacimiento << ',' << pac->estado << ',' << pac->id << endl; //todo preguntar
+            archivo << pac->nombre << ',' << pac->apellido << ',' << pac->sexo << ',' << pac->nacimiento.fecha.tm_mday << '/' << pac->nacimiento.fecha.tm_mon << '/' << pac->nacimiento.fecha.tm_year << '/' << pac->estado << ',' << pac->dni << endl; //todo preguntar
         }
     }
     archivo.close();
@@ -46,17 +47,18 @@ void guardararchivo(string nombrearchivo, Paciente* pac)
 
 
 paciente& buscarPaciente(string ArchivoCompleto, string _id) {
-    string coma;
+    string coma = ",";
+    string barra = "/";
     paciente aux;
     paciente aux1;
     fstream miArchivo;
     miArchivo.open(ArchivoCompleto, ios::in);
     while (miArchivo)
     {
-        dni, , , sexo, natalicio,
 
-            miArchivo >> aux.id >> coma >> aux.nombre >> coma >> aux.apellido >> coma >> aux.estado >> coma >> aux.dni >> coma >> aux.sexo >> coma >> aux.natalicio;
-        if (aux.id == _id)
+
+        miArchivo >> aux.dni >> coma >> aux.nombre >> coma >> aux.apellido >> coma >> aux.estado >> coma >> aux.dni >> coma >> aux.sexo >> coma >> aux.nacimiento.fecha.tm_mday >> barra >> aux.nacimiento.fecha.tm_mon >> barra >> aux.nacimiento.fecha.tm_year;
+        if (aux.dni == _id)
         {
             aux1 = aux;
         }
@@ -70,17 +72,17 @@ paciente& buscarPaciente(string ArchivoCompleto, string _id) {
 
 }
 void recuperarPaciente(ultimaConsulta consultaPaciente, ifstream ArchivoCompleto) {
-    paciente* Pac = &buscarPaciente("ArchivoCompleto.csv", consultaPaciente.id);
+    paciente* Pac = &buscarPaciente("ArchivoCompleto.csv", consultaPaciente.dni_pac);
     if (Pac->dni == "404") //si el paciente esta vacio quiere decir q no lo encontre, aca hay q ver tema punteros.
     {
         cout << "No se encontro el paciente" << endl;
     }
     else if (chequearfechas(&consultaPaciente) == true && Pac->asistencia == false) {
-        if (Pac->estado == DIFUNTO) {
+        if (Pac->estado == "DIFUNTO") {
             Pac->archivado = "Archivado";
             guardararchivo("ArchivosArchivados.csv", Pac); //lo mando al archivo q no se recuperan
         }
-        else if (Pac->estado == INTERNADO) {
+        else if (Pac->estado == "INTERNADO") {
             cout << "El paciente se encuentra internado " << endl;
             guardararchivo("ArchivoPac", Pac);
         }
@@ -101,9 +103,9 @@ void informarsecretaria(Paciente& pac)
         cout << "VUelve el paciente";
         pac.retorno = true;
         cout << "ingrese su nueva obra social";
-        if (pac.obrasocial != aux)
+        if (pac.obra_social != aux)
         {
-            pac.obrasocial = aux;
+            pac.obra_social = aux;
         }
     }
     else

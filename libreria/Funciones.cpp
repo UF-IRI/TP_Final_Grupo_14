@@ -2,7 +2,7 @@
 #include "Funciones.h"
 #include <string>
 
-bool chequearfechas(ultConsulta* Consulta)
+bool chequearfechas(ultConsulta Consulta)
 {
     time_t auxiliar_fecha = time(0);
     tm* hoy = localtime(&auxiliar_fecha);
@@ -13,7 +13,7 @@ bool chequearfechas(ultConsulta* Consulta)
     int dif = 0;//
 
     time_t aux_fin = mktime(&fecha_hoy);
-    time_t aux_inicio = mktime(&(Consulta->consulta.fecha));
+    time_t aux_inicio = mktime(&(Consulta.consulta.fecha));
 
     dif = difftime(aux_fin, aux_inicio) / (31536000); //calculo la diferencia de tiempo en segundos y lo transformamos a anios
 
@@ -22,7 +22,7 @@ bool chequearfechas(ultConsulta* Consulta)
     else
         return true;
 }
-void guardararchivo(fstream& archivo, Paciente* pac)
+void guardararchivo(fstream& archivo, Paciente pac)
 {
     string aux;
     if (archivo.is_open())
@@ -35,13 +35,15 @@ void guardararchivo(fstream& archivo, Paciente* pac)
         }
         else
         {
-            archivo << pac->nombre << ',' << pac->apellido << ',' << pac->sexo << ',' << pac->nacimiento.fecha.tm_mday << '/' << pac->nacimiento.fecha.tm_mon << '/' << pac->nacimiento.fecha.tm_year << '/' << pac->estado << ',' << pac->dni << endl; //todo preguntar
+            archivo << pac.nombre << ',' << pac.apellido << ',' << pac.sexo << ',' << pac.nacimiento.fecha.tm_mday << '/' << pac.nacimiento.fecha.tm_mon << '/' << pac.nacimiento.fecha.tm_year << '/' << pac.estado << ',' << pac.dni << endl; //todo preguntar
         }
+        return true;
     }
-    archivo.close();
+    else return false;
+    
 
 }
-ultConsulta chequearUltFechaConsulta(Paciente pac, ifstream ArchConsultas)
+ultConsulta chequearUltFechaConsulta(Paciente pac, fstream& ArchConsultas)
 {
 	int dif;
 	int n = 0;
@@ -68,30 +70,36 @@ ultConsulta chequearUltFechaConsulta(Paciente pac, ifstream ArchConsultas)
         }
     }
 }
-paciente& buscarPaciente(ifstream& Archivocompleto, string _id) {
-    string coma = ",";
-    string barra = "/";
-    paciente aux;
-    paciente aux1;
+Paciente buscarPaciente(fstream& Archivocompleto, string _id) {
+    char coma = ',';
+    char barra = '/';
+    Paciente aux;
+    Paciente aux1;
+    string encabezado;
+    int i = 0;
     while (Archivocompleto)
     {
+        if (i == 0)
+        {
+            Archivocompleto>>encabezado >> coma >> encabezado >> encabezado >> encabezado>> coma >> encabezado >> coma >> encabezado >> barra >> encabezado >> barra >>encabezado >> coma >>encabezado >> coma >> encabezado;
+            i++;
+        }
         Archivocompleto >> aux.dni >> coma >> aux.nombre >> coma >> aux.apellido >> coma >> aux.sexo >> coma >> aux.nacimiento.fecha.tm_mday >> barra >> aux.nacimiento.fecha.tm_mon >> barra >> aux.nacimiento.fecha.tm_year >> coma >> aux.estado >> coma >> aux.obra_social;
         if (aux.dni == _id)
         {
             aux1 = aux;
+            return aux1;
         }
-        else
-        {
-            aux.dni = "404";
-            return aux;
-        }
+       
     }
-    return aux1;
+    
+     aux1.dni= "404";
+     return aux1;
 
 }
 
 
-void recuperarPaciente(ifstream& ArchivoConsultas, ifstream& ArchivoCompleto, fstream& Archivados, fstream& ArchivoPacientes, fstream& Archivocontactos) {
+void recuperarPaciente(fstream& ArchivoConsultas, fstream& ArchivoCompleto, fstream& Archivados, fstream& ArchivoPacientes, fstream& Archivocontactos) {
     ultimaConsulta aux;
     char coma = ',';
     char barra = '/';
@@ -99,41 +107,44 @@ void recuperarPaciente(ifstream& ArchivoConsultas, ifstream& ArchivoCompleto, fs
     ArchivoConsultas >> encabezado >> coma >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> coma >> encabezado;//todo ver
     ArchivoConsultas >> aux.dni_pac >> coma >> aux.consulta.fecha.tm_mday >> barra >> aux.consulta.fecha.tm_mon >> barra >> aux.consulta.fecha.tm_year >> barra >> aux.fecha_turno.fecha.tm_mday >> barra >> aux.fecha_turno.fecha.tm_mon >> barra >> aux.fecha_turno.fecha.tm_year >> barra >> aux.presento >> coma >> aux.matricula_med;
     paciente Pac = buscarPaciente(ArchivoCompleto, aux.dni_pac);
-    if (Pac->dni == "404") //si el paciente esta vacio quiere decir q no lo encontre, aca hay q ver tema punteros.
+    ultConsulta aux2 = chequearUltFechaConsulta(Pac, ArchivoConsultas);
+    if (Pac.dni == "404") //si el paciente esta vacio quiere decir q no lo encontre, aca hay q ver tema punteros.
     {
         cout << "No se encontro el paciente" << endl;
     }
 
-    else if (chequearfechas(chequearUltFechaConsulta(Pac,ArchivoConsultas)) == true && Pac->asistencia == false) {
-        if (Pac->estado == "fallecido") 
+    else if (chequearfechas(aux2) == true && Pac.asistencia == false) {
+        if (Pac.estado == "fallecido") 
         {
-            Pac->archivado = "Archivado";
+            Pac.archivado = "Archivado";
             guardararchivo(Archivados, Pac); //lo mando al archivo q no se recuperan
         }
-        else if (Pac->estado == "internado") 
+        else if (Pac.estado == "internado") 
         {
             cout << "El paciente se encuentra internado " << endl;
             guardararchivo(ArchivoPacientes, Pac);
         }
         else {
-            informarsecretaria(*Pac,Archivados,Archivocontactos); //se lo mando a secretaria para preguntarle al paciente si vuelve
+            informarsecretaria(Pac,Archivados,Archivocontactos); //se lo mando a secretaria para preguntarle al paciente si vuelve
             guardararchivo(ArchivoPacientes, Pac); // lo guardo para despues preguntar si vuelve
         }
     }// si pasaron menos de 10 años y no reprogramo puede volver
 }
 
-bool informarsecretaria(Paciente& pac, fstream& Archivados, fstream& Archivocontactos)
+bool informarsecretaria(Paciente pac, fstream& Archivados, fstream& Archivocontactos)
 {
     int n = 0;
     Contacto* contactoaux = new Contacto[n];
     Contacto contact;
     string aux;
     string encabezado;
+    Paciente auxx;
     char coma = ',';
     int i = 0;
     int falso = -1;
-
-    if (vincularcontacto(pac,Archivocontactos) == true)
+   // bool hola = vincularcontacto(pac, Archivocontactos);
+    bool hola = true;
+    if (hola == true)
     {
         cout << "Llamando al paciente: " << pac.nombre << pac.apellido << "Su numero es: " << contact.celular << endl;
         cout << "Vuelve";
@@ -153,7 +164,7 @@ bool informarsecretaria(Paciente& pac, fstream& Archivados, fstream& Archivocont
         {
             cout << "No vuelve el paciente";
             pac.archivado = "archivado";
-            guardararchivo(Archivados, &pac);
+            guardararchivo(Archivados, pac);
             return false;
         }
     }
@@ -239,7 +250,7 @@ void resizeConsultas (ultimaConsulta*& vector, int* n)
     vector = aux; 
 }
 
-bool vincularcontacto(Paciente& pac, fstream& Archivocontactos)
+bool vincularcontacto(Paciente pac, fstream& Archivocontactos)
 {
     int n = 1;
     string aux;
@@ -249,30 +260,35 @@ bool vincularcontacto(Paciente& pac, fstream& Archivocontactos)
     int i = 0;
     int falso = -1;
     Contacto contact;
-
-    while (Archivocontactos) {
-        if (i == 0)
-        {
-            Archivocontactos >> encabezado >> coma >> encabezado >> coma >> encabezado >> coma >> encabezado >> coma >> encabezado;
-            i++;
-        }
-        else
-        {
-            Archivocontactos >> contactoaux[n].dni_pac >> coma >> contactoaux[n].telefono >> coma >> contactoaux[n].celular >> coma >> contactoaux[n].direccion >> coma >> contactoaux[n].email;
-            resizecontacto(contactoaux, &n);
-        }
-    }
-    for (int k = 0; k < n; k++) 
+    if (!Archivocontactos.is_open())
     {
-        if (contactoaux[k].dni_pac == pac.dni) 
-        {
-            contact = contactoaux[k];
-            falso = 9;
-            return true;
+        return false;
+    }
+    else {
+        while (Archivocontactos) {
+            if (i == 0)
+            {
+                Archivocontactos >> encabezado >> coma >> encabezado >> coma >> encabezado >> coma >> encabezado >> coma >> encabezado;
+                i++;
+            }
+            else
+            {
+                Archivocontactos >> contactoaux[n].dni_pac >> coma >> contactoaux[n].telefono >> coma >> contactoaux[n].celular >> coma >> contactoaux[n].direccion >> coma >> contactoaux[n].email;
+                resizecontacto(contactoaux, &n);
+            }
         }
-        else return false;
-        
-       //hubo un problema para encontrar el contacto del paciente
+        for (int k = 0; k < n; k++)
+        {
+            if (contactoaux[k].dni_pac == pac.dni)
+            {
+                contact = contactoaux[k];
+                falso = 9;
+                return true;
+            }
+            else return false;
+
+            //hubo un problema para encontrar el contacto del paciente
+        }
     }
 }
 
@@ -326,7 +342,8 @@ bool archivarmedico(fstream& archivomedicoslistados, Paciente pac, fstream& arch
     {
         for (int k = 0; k < m; k++)
         {
-            if (consultasaux[n].matricula_med==medicoaux[m].matricula) 
+            
+            if (chequearconymed(medicoaux[k], consultasaux[w])==true)
             {
                 pasar = medicoaux[m];
             }
@@ -358,3 +375,11 @@ bool archivarmedico(fstream& archivomedicoslistados, Paciente pac, fstream& arch
 
 }
 
+bool chequearconymed(Medico med,ultimaConsulta consulta)
+{
+    if (med.matricula == consulta.matricula_med)
+    {
+        return true;
+    }
+    else return false;
+}

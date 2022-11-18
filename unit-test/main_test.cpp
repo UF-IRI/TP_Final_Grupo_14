@@ -18,7 +18,7 @@ namespace foobar::tests {
 			else			
 			Consul >> consulta.dni_pac >> coma >> consulta.consulta.fecha.tm_mday >> barra >> consulta.consulta.fecha.tm_mon >> barra >> consulta.consulta.fecha.tm_year >> barra>> consulta.fecha_turno.fecha.tm_mday >> barra >> consulta.fecha_turno.fecha.tm_mon >> barra >> consulta.fecha_turno.fecha.tm_year >> barra >> consulta.presento >> coma >> consulta.matricula_med;
 		}
-		EXPECT_TRUE(chequearfechas(&consulta)==true);
+		EXPECT_TRUE(chequearfechas(consulta)==true);
 		Consul.close();
 	}
 	TEST(informarpaciente, funcioninformar)
@@ -56,7 +56,7 @@ namespace foobar::tests {
 		pac1.nacimiento.fecha.tm_year=1970;
 		pac1.estado="n/c";
 		pac1.obra_social= "OSDE";
-		EXPECT_THAT(pac1,buscarPaciente(miArch,_id));
+		EXPECT_THAT(buscarPaciente(miArch,_id),pac1);
 		miArch.close();
 	}
 

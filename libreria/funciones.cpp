@@ -2,7 +2,7 @@
 #include "Funciones.h"
 #include <string>
 
-bool chequearfechas(ultConsulta* Consulta)
+bool chequearfechas(ultConsulta Consulta)
 {
     time_t auxiliar_fecha = time(0);
     tm* hoy = localtime(&auxiliar_fecha);
@@ -13,7 +13,7 @@ bool chequearfechas(ultConsulta* Consulta)
     int dif = 0;//
 
     time_t aux_fin = mktime(&fecha_hoy);
-    time_t aux_inicio = mktime(&(Consulta->consulta.fecha));
+    time_t aux_inicio = mktime(&(Consulta.consulta.fecha));
 
     dif = difftime(aux_fin, aux_inicio) / (31536000); //calculo la diferencia de tiempo en segundos y lo transformamos a anios
 
@@ -41,7 +41,7 @@ void guardararchivo(fstream& archivo, Paciente* pac)
     archivo.close();
 
 }
-ultConsulta chequearUltFechaConsulta(Paciente pac, ifstream ArchConsultas)
+ultConsulta chequearUltFechaConsulta(Paciente pac, ifstream& ArchConsultas)
 {
 	int dif;
 	int n = 0;
@@ -68,7 +68,7 @@ ultConsulta chequearUltFechaConsulta(Paciente pac, ifstream ArchConsultas)
         }
     }
 }
-paciente& buscarPaciente(ifstream& Archivocompleto, string _id) {
+paciente buscarPaciente(ifstream& Archivocompleto, string _id) {
     string coma = ",";
     string barra = "/";
     paciente aux;
@@ -93,31 +93,32 @@ paciente& buscarPaciente(ifstream& Archivocompleto, string _id) {
 
 void recuperarPaciente(ifstream& ArchivoConsultas, ifstream& ArchivoCompleto, fstream& Archivados, fstream& ArchivoPacientes, fstream& Archivocontactos) {
     ultimaConsulta aux;
+    ultimaConsulta aux1;
     char coma = ',';
     char barra = '/';
     string encabezado;
     ArchivoConsultas >> encabezado >> coma >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> coma >> encabezado;//todo ver
     ArchivoConsultas >> aux.dni_pac >> coma >> aux.consulta.fecha.tm_mday >> barra >> aux.consulta.fecha.tm_mon >> barra >> aux.consulta.fecha.tm_year >> barra >> aux.fecha_turno.fecha.tm_mday >> barra >> aux.fecha_turno.fecha.tm_mon >> barra >> aux.fecha_turno.fecha.tm_year >> barra >> aux.presento >> coma >> aux.matricula_med;
-    paciente Pac = buscarPaciente(ArchivoCompleto, aux.dni_pac);
-    if (Pac->dni == "404") //si el paciente esta vacio quiere decir q no lo encontre, aca hay q ver tema punteros.
+    Paciente pac = buscarPaciente(ArchivoCompleto, aux.dni_pac);
+    aux1 = chequearUltFechaConsulta(pac, ArchivoConsultas);
+    if (pac.dni == "404") //si el paciente esta vacio quiere decir q no lo encontre, aca hay q ver tema punteros.
     {
         cout << "No se encontro el paciente" << endl;
     }
-
-    else if (chequearfechas(chequearUltFechaConsulta(Pac,ArchivoConsultas)) == true && Pac->asistencia == false) {
-        if (Pac->estado == "fallecido") 
+    else if (chequearfechas(aux1) == true && pac.asistencia == false) {
+        if (pac.estado == "fallecido") 
         {
-            Pac->archivado = "Archivado";
-            guardararchivo(Archivados, Pac); //lo mando al archivo q no se recuperan
+            pac.archivado = "Archivado";
+            guardararchivo(Archivados, &pac); //lo mando al archivo q no se recuperan
         }
-        else if (Pac->estado == "internado") 
+        else if (pac.estado == "internado") 
         {
             cout << "El paciente se encuentra internado " << endl;
-            guardararchivo(ArchivoPacientes, Pac);
+            guardararchivo(ArchivoPacientes, &pac);
         }
         else {
-            informarsecretaria(*Pac,Archivados,Archivocontactos); //se lo mando a secretaria para preguntarle al paciente si vuelve
-            guardararchivo(ArchivoPacientes, Pac); // lo guardo para despues preguntar si vuelve
+            informarsecretaria(pac,Archivados,Archivocontactos); //se lo mando a secretaria para preguntarle al paciente si vuelve
+            guardararchivo(ArchivoPacientes, &pac); // lo guardo para despues preguntar si vuelve
         }
     }// si pasaron menos de 10 años y no reprogramo puede volver
 }
@@ -239,7 +240,7 @@ void resizeConsultas (ultimaConsulta*& vector, int* n)
     vector = aux; 
 }
 
-bool vincularcontacto(Paciente& pac, fstream& Archivocontactos)
+bool vincularcontacto(Paciente pac, fstream& Archivocontactos)
 {
     int n = 1;
     string aux;

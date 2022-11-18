@@ -18,9 +18,9 @@ bool chequearfechas(ultConsulta Consulta)
     dif = difftime(aux_fin, aux_inicio) / (31536000); //calculo la diferencia de tiempo en segundos y lo transformamos a anios
 
     if (dif > 10)
-        return false;
+        return false;//no puede volver
     else
-        return true;
+        return true; //puede volver
 }
 void guardararchivo(fstream& archivo, Paciente pac)
 {
@@ -40,8 +40,6 @@ void guardararchivo(fstream& archivo, Paciente pac)
         
     }
    
-    
-
 }
 ultConsulta chequearUltFechaConsulta(Paciente pac, fstream& ArchConsultas)
 {
@@ -93,7 +91,7 @@ Paciente buscarPaciente(fstream& Archivocompleto, string _id) {
        
     }
     
-     aux1.dni= "404";
+     aux1.dni= "404";//not found
      return aux1;
 
 }
@@ -105,7 +103,7 @@ void recuperarPaciente(fstream& ArchivoConsultas, fstream& ArchivoCompleto, fstr
     char barra = '/';
     string encabezado;
     ArchivoConsultas >> encabezado >> coma >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> coma >> encabezado;//todo ver
-    ArchivoConsultas >> aux.dni_pac >> coma >> aux.consulta.fecha.tm_mday >> barra >> aux.consulta.fecha.tm_mon >> barra >> aux.consulta.fecha.tm_year >> barra >> aux.fecha_turno.fecha.tm_mday >> barra >> aux.fecha_turno.fecha.tm_mon >> barra >> aux.fecha_turno.fecha.tm_year >> barra >> aux.presento >> coma >> aux.matricula_med;
+    ArchivoConsultas >> aux.dni_pac >> coma >> aux.consulta.fecha.tm_mday >> barra >> aux.consulta.fecha.tm_mon >> barra >> aux.consulta.fecha.tm_year >> barra >> aux.fecha_turno.fecha.tm_mday >> barra >> aux.fecha_turno.fecha.tm_mon >> barra >> aux.fecha_turno.fecha.tm_year >> barra >> aux.presento >> coma >> aux.matricula_med; //posible error?
     paciente Pac = buscarPaciente(ArchivoCompleto, aux.dni_pac);
     ultConsulta aux2 = chequearUltFechaConsulta(Pac, ArchivoConsultas);
     if (Pac.dni == "404") //si el paciente esta vacio quiere decir q no lo encontre, aca hay q ver tema punteros.
@@ -126,12 +124,12 @@ void recuperarPaciente(fstream& ArchivoConsultas, fstream& ArchivoCompleto, fstr
         }
         else {
             informarsecretaria(Pac,Archivados,Archivocontactos); //se lo mando a secretaria para preguntarle al paciente si vuelve
-            guardararchivo(ArchivoPacientes, Pac); // lo guardo para despues preguntar si vuelve
+            // lo guardo para despues preguntar si vuelve
         }
     }// si pasaron menos de 10 años y no reprogramo puede volver
 }
 
-bool informarsecretaria(Paciente pac, fstream& Archivados, fstream& Archivocontactos)
+bool informarsecretaria(Paciente pac, fstream& Archivados, fstream& Archivocontactos, fstream& archivopacientes)
 {
     int n = 0;
     Contacto* contactoaux = new Contacto[n];
@@ -142,10 +140,11 @@ bool informarsecretaria(Paciente pac, fstream& Archivados, fstream& Archivoconta
     char coma = ',';
     int i = 0;
     int falso = -1;
-   // bool hola = vincularcontacto(pac, Archivocontactos);
-    bool hola = true;
+    bool hola = vincularcontacto(pac, Archivocontactos); //funciona, puedo hacerlo por izquierda,falta vincular cont
+    
     if (hola == true)
     {
+       
         cout << "Llamando al paciente: " << pac.nombre << pac.apellido << "Su numero es: " << contact.celular << endl;
         cout << "Vuelve";
         cin >> aux;
@@ -158,6 +157,7 @@ bool informarsecretaria(Paciente pac, fstream& Archivados, fstream& Archivoconta
             {
                 pac.obra_social = aux;
             }
+            guardararchivo(archivopacientes, pac);
             return true;
         }
         else
@@ -250,7 +250,7 @@ void resizeConsultas (ultimaConsulta*& vector, int* n)
     vector = aux; 
 }
 
-bool vincularcontacto(Paciente pac, fstream& Archivocontactos)
+bool vincularcontacto(Paciente pac, fstream& Archivocontactos) //puede desreferenciar 
 {
     int n = 1;
     string aux;
@@ -345,7 +345,7 @@ bool archivarmedico(fstream& archivomedicoslistados, Paciente pac, fstream& arch
             
             if (chequearconymed(medicoaux[k], consultasaux[w])==true)
             {
-                pasar = medicoaux[m];
+                pasar = medicoaux[k];
             }
         }
     }
@@ -368,6 +368,7 @@ bool archivarmedico(fstream& archivomedicoslistados, Paciente pac, fstream& arch
                     return true;
 
                 }
+               
             }
         }
 

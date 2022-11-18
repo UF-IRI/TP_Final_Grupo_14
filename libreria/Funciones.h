@@ -5,7 +5,7 @@
 
 bool chequearfechas(ultConsulta Consulta);
 void guardararchivo(fstream& archivo, Paciente pac);
-bool informarsecretaria(Paciente pac, fstream& Archivados, fstream &Archivocontactos);
+bool informarsecretaria(Paciente pac, fstream& Archivados, fstream &Archivocontactos, fstream& archivopacientes);
 Paciente buscarPaciente(fstream& Archivocompleto, string _id);
 void guardararchivocontacto(fstream &Archivo, contacto Contacto);
 void guardarmedicos(fstream& Archivo, medico medico);

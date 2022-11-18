@@ -13,7 +13,7 @@ int main() {
     fstream ArchivoPacientes;
 
     ArchivoConsul.open("Consultas.csv", ios::app);
-    ArchivoContact.open("Contactos.csv", ios::app);
+    ArchivoContact.open("Contactos.csv", ios::app);//se abre mal
     ArchivoMedicos.open("Medicos.csv", ios::app);
     ArchivoPacientes.open("Pacientes.csv", ios::app);
 
@@ -61,7 +61,7 @@ int main() {
     paciente.estado = "internado";
     paciente.obra_social = "Galeno";
 
-    guardararchivo(ArchivoPacientes, &paciente);
+    guardararchivo(ArchivoPacientes, paciente);
     guardararchivocontacto(ArchivoContact, contacto);
     guardarmedicos(ArchivoMedicos, medico);
 

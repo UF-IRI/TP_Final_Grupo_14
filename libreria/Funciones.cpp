@@ -24,9 +24,7 @@ bool chequearfechas(ultConsulta* Consulta)
 }
 void guardararchivo(fstream& archivo, Paciente* pac)
 {
-    
     string aux;
-
     if (archivo.is_open())
     {
         getline(archivo, aux);
@@ -43,7 +41,7 @@ void guardararchivo(fstream& archivo, Paciente* pac)
     archivo.close();
 
 }
-ultConsulta* chequearUltFechaConsulta(paciente pac, ifstream ArchConsultas)
+ultConsulta chequearUltFechaConsulta(Paciente pac, ifstream ArchConsultas)
 {
 	int dif;
 	int n = 0;
@@ -66,7 +64,7 @@ ultConsulta* chequearUltFechaConsulta(paciente pac, ifstream ArchConsultas)
     for(int j=0;j<n;j++){
         if(aux[j].dni_pac==pac.dni) //la primera que se cumple es la ultima
         {
-            return;
+            return aux[j];
         }
     }
 }
@@ -93,20 +91,20 @@ paciente& buscarPaciente(ifstream& Archivocompleto, string _id) {
 }
 
 
-void recuperarPaciente(ifstream ArchivoConsultas, ifstream ArchivoCompleto, fstream& Archivados, fstream& ArchivoPacientes, fstream& Archivocontactos) {
+void recuperarPaciente(ifstream& ArchivoConsultas, ifstream& ArchivoCompleto, fstream& Archivados, fstream& ArchivoPacientes, fstream& Archivocontactos) {
     ultimaConsulta aux;
     char coma = ',';
     char barra = '/';
     string encabezado;
     ArchivoConsultas >> encabezado >> coma >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> barra >> encabezado >> coma >> encabezado;//todo ver
     ArchivoConsultas >> aux.dni_pac >> coma >> aux.consulta.fecha.tm_mday >> barra >> aux.consulta.fecha.tm_mon >> barra >> aux.consulta.fecha.tm_year >> barra >> aux.fecha_turno.fecha.tm_mday >> barra >> aux.fecha_turno.fecha.tm_mon >> barra >> aux.fecha_turno.fecha.tm_year >> barra >> aux.presento >> coma >> aux.matricula_med;
-    paciente* Pac = &buscarPaciente(ArchivoCompleto, aux.dni_pac);
+    paciente Pac = buscarPaciente(ArchivoCompleto, aux.dni_pac);
     if (Pac->dni == "404") //si el paciente esta vacio quiere decir q no lo encontre, aca hay q ver tema punteros.
     {
         cout << "No se encontro el paciente" << endl;
     }
 
-    else if (chequearfechas(&aux) == true && Pac->asistencia == false) {
+    else if (chequearfechas(chequearUltFechaConsulta(Pac,ArchivoConsultas)) == true && Pac->asistencia == false) {
         if (Pac->estado == "fallecido") 
         {
             Pac->archivado = "Archivado";

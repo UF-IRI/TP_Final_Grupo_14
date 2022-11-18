@@ -15,5 +15,5 @@ bool vincularcontacto(Paciente& pac, fstream& Archivocontactos);
 bool archivarmedico(fstream& archivomedicoslistados, Paciente pac, fstream& archivo,fstream& consultas);
 void resizeConsultas(ultimaConsulta*& vector, int* n);
 void resizeMedico(Medico*& vector, int* n);
-
+ultConsulta chequearUltFechaConsulta(Paciente pac, ifstream ArchConsultas);
 

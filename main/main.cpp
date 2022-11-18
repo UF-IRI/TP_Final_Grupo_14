@@ -61,12 +61,13 @@ int main() {
     paciente.estado = "internado";
     paciente.obra_social = "Galeno";
 
-
-
-
     guardararchivo(ArchivoPacientes, &paciente);
     guardararchivocontacto(ArchivoContact, contacto);
     guardarmedicos(ArchivoMedicos, medico);
+
+
+
+
 
 
     return EXIT_SUCCESS;

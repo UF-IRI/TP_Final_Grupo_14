@@ -64,8 +64,10 @@ int main() {
 
 
 
-
+    guardararchivo(ArchivoPacientes, &paciente);
     guardararchivocontacto(ArchivoContact, contacto);
+    guardarmedicos(ArchivoMedicos, medico);
+
 
     return EXIT_SUCCESS;
 }

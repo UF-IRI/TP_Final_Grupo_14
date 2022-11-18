@@ -1,6 +1,12 @@
 #pragma once
 #include <string>
 #include <iostream>
+//#define Archivados "Archivados.csv" //van los que no retornan
+//#define HistoriasClinicas ".../data_files/input/IRI_Pacientes.csv" // todos los que alguna vez se atendieron en el sanatorio
+//#define Contacto ".../data_files/input/IRI_Contactos.csv" // datos para ccontactar cada paciente
+//#define Consultas ".../data_files/input/IRI_Consultas.csv" //toda las ultimas consultas de todos los pacientes
+//#define Medicos  ".../data_files/input/IRI_Medicos.csv" // archivo  con todos los medicos
+//#define Actuales "Actuales.csv" // donde guardaremos los pacientes que se seguiran atendiendo en el hospital
 using namespace std;
 
 //enum Estado {

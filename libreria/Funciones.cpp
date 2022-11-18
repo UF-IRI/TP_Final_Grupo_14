@@ -37,9 +37,9 @@ void guardararchivo(fstream& archivo, Paciente pac)
         {
             archivo << pac.nombre << ',' << pac.apellido << ',' << pac.sexo << ',' << pac.nacimiento.fecha.tm_mday << '/' << pac.nacimiento.fecha.tm_mon << '/' << pac.nacimiento.fecha.tm_year << '/' << pac.estado << ',' << pac.dni << endl; //todo preguntar
         }
-        return true;
+        
     }
-    else return false;
+   
     
 
 }
